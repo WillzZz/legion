@@ -31,7 +31,9 @@ pub struct ComponentTypeId(TypeId);
 
 impl ComponentTypeId {
     /// Gets the component type ID that represents type `T`.
-    pub fn of<T: Component>() -> Self { ComponentTypeId(TypeId::of::<T>()) }
+    pub fn of<T: Component>() -> Self {
+        ComponentTypeId(TypeId::of::<T>())
+    }
 }
 
 /// A type ID identifying a tag type.
@@ -40,7 +42,9 @@ pub struct TagTypeId(TypeId);
 
 impl TagTypeId {
     /// Gets the tag type ID that represents type `T`.
-    pub fn of<T: Tag>() -> Self { TagTypeId(TypeId::of::<T>()) }
+    pub fn of<T: Tag>() -> Self {
+        TagTypeId(TypeId::of::<T>())
+    }
 }
 
 /// A `Component` is per-entity data that can be attached to a single entity.
@@ -66,24 +70,36 @@ pub struct TagTypes(SliceVec<TagTypeId>);
 
 impl ComponentTypes {
     /// Gets an iterator over all type ID slices.
-    pub fn iter(&self) -> SliceVecIter<ComponentTypeId> { self.0.iter() }
+    pub fn iter(&self) -> SliceVecIter<ComponentTypeId> {
+        self.0.iter()
+    }
 
     /// Gets the number of slices stored within the set.
-    pub fn len(&self) -> usize { self.0.len() }
+    pub fn len(&self) -> usize {
+        self.0.len()
+    }
 
     /// Determines if the set is empty.
-    pub fn is_empty(&self) -> bool { self.len() < 1 }
+    pub fn is_empty(&self) -> bool {
+        self.len() < 1
+    }
 }
 
 impl TagTypes {
     /// Gets an iterator over all type ID slices.
-    pub fn iter(&self) -> SliceVecIter<TagTypeId> { self.0.iter() }
+    pub fn iter(&self) -> SliceVecIter<TagTypeId> {
+        self.0.iter()
+    }
 
     /// Gets the number of slices stored within the set.
-    pub fn len(&self) -> usize { self.0.len() }
+    pub fn len(&self) -> usize {
+        self.0.len()
+    }
 
     /// Determines if the set is empty.
-    pub fn is_empty(&self) -> bool { self.len() < 1 }
+    pub fn is_empty(&self) -> bool {
+        self.len() < 1
+    }
 }
 
 /// A vector of slices.
@@ -98,10 +114,14 @@ pub struct SliceVec<T> {
 
 impl<T> SliceVec<T> {
     /// Gets the length of the vector.
-    pub fn len(&self) -> usize { self.counts.len() }
+    pub fn len(&self) -> usize {
+        self.counts.len()
+    }
 
     /// Determines if the vector is empty.
-    pub fn is_empty(&self) -> bool { self.len() < 1 }
+    pub fn is_empty(&self) -> bool {
+        self.len() < 1
+    }
 
     /// Pushes a new slice onto the end of the vector.
     pub fn push<I: IntoIterator<Item = T>>(&mut self, items: I) {
@@ -196,18 +216,26 @@ impl Storage {
     /// Gets a vector of slices of all component types for all archetypes.
     ///
     /// Each slice contains the component types for the archetype at the corresponding index.
-    pub fn component_types(&self) -> &ComponentTypes { &self.component_types }
+    pub fn component_types(&self) -> &ComponentTypes {
+        &self.component_types
+    }
 
     /// Gets a vector of slices of all tag types for all archetypes.
     ///
     /// Each slice contains the tag types for the archetype at the corresponding index.
-    pub fn tag_types(&self) -> &TagTypes { &self.tag_types }
+    pub fn tag_types(&self) -> &TagTypes {
+        &self.tag_types
+    }
 
     /// Gets a slice reference to all archetypes.
-    pub fn archetypes(&self) -> &[ArchetypeData] { &self.archetypes }
+    pub fn archetypes(&self) -> &[ArchetypeData] {
+        &self.archetypes
+    }
 
     /// Gets a mutable slice reference to all archetypes.
-    pub fn archetypes_mut(&mut self) -> &mut [ArchetypeData] { &mut self.archetypes }
+    pub fn archetypes_mut(&mut self) -> &mut [ArchetypeData] {
+        &mut self.archetypes
+    }
 
     pub(crate) fn drain<R: RangeBounds<usize>>(
         &mut self,
@@ -242,15 +270,21 @@ impl TagMeta {
         }
     }
 
-    pub(crate) fn equals(&self, a: *const u8, b: *const u8) -> bool { (self.eq_fn)(a, b) }
+    pub(crate) fn equals(&self, a: *const u8, b: *const u8) -> bool {
+        (self.eq_fn)(a, b)
+    }
 
-    pub(crate) fn clone(&self, src: *const u8, dst: *mut u8) { (self.clone_fn)(src, dst) }
+    pub(crate) fn clone(&self, src: *const u8, dst: *mut u8) {
+        (self.clone_fn)(src, dst)
+    }
 
     pub(crate) fn layout(&self) -> std::alloc::Layout {
         unsafe { std::alloc::Layout::from_size_align_unchecked(self.size, self.align) }
     }
 
-    pub(crate) fn is_zero_sized(&self) -> bool { self.size == 0 }
+    pub(crate) fn is_zero_sized(&self) -> bool {
+        self.size == 0
+    }
 }
 
 /// Stores metadata describing the type of a component.
@@ -282,10 +316,14 @@ pub struct ArchetypeDescription {
 
 impl ArchetypeDescription {
     /// Gets a slice of the tags in the description.
-    pub fn tags(&self) -> &[(TagTypeId, TagMeta)] { &self.tags }
+    pub fn tags(&self) -> &[(TagTypeId, TagMeta)] {
+        &self.tags
+    }
 
     /// Gets a slice of the components in the description.
-    pub fn components(&self) -> &[(ComponentTypeId, ComponentMeta)] { &self.components }
+    pub fn components(&self) -> &[(ComponentTypeId, ComponentMeta)] {
+        &self.components
+    }
 
     /// Adds a tag to the description.
     pub fn register_tag_raw(&mut self, type_id: TagTypeId, type_meta: TagMeta) {
@@ -333,11 +371,17 @@ const COMPONENT_STORAGE_ALIGNMENT: usize = 64;
 pub struct ArchetypeId(WorldId, usize);
 
 impl ArchetypeId {
-    pub(crate) fn new(world_id: WorldId, index: usize) -> Self { ArchetypeId(world_id, index) }
+    pub(crate) fn new(world_id: WorldId, index: usize) -> Self {
+        ArchetypeId(world_id, index)
+    }
 
-    fn index(self) -> usize { self.1 }
+    fn index(self) -> usize {
+        self.1
+    }
 
-    fn world(self) -> WorldId { self.0 }
+    fn world(self) -> WorldId {
+        self.0
+    }
 }
 
 /// Contains all of the tags attached to the entities in each chunk.
@@ -533,7 +577,9 @@ impl ArchetypeData {
     }
 
     /// Gets the unique ID of this archetype.
-    pub fn id(&self) -> ArchetypeId { self.id }
+    pub fn id(&self) -> ArchetypeId {
+        self.id
+    }
 
     pub(crate) fn merge(&mut self, mut other: ArchetypeData) {
         for (i, mut set) in other.chunk_sets.drain(..).enumerate() {
@@ -603,22 +649,34 @@ impl ArchetypeData {
     }
 
     /// Gets the number of chunk sets stored within this archetype.
-    pub fn len(&self) -> usize { self.chunk_sets.len() }
+    pub fn len(&self) -> usize {
+        self.chunk_sets.len()
+    }
 
     /// Determines whether this archetype has any chunks.
-    pub fn is_empty(&self) -> bool { self.len() < 1 }
+    pub fn is_empty(&self) -> bool {
+        self.len() < 1
+    }
 
     /// Gets the tag storage for all chunks in the archetype.
-    pub fn tags(&self) -> &Tags { &self.tags }
+    pub fn tags(&self) -> &Tags {
+        &self.tags
+    }
 
     /// Gets a slice of chunksets.
-    pub fn chunksets(&self) -> &[Chunkset] { &self.chunk_sets }
+    pub fn chunksets(&self) -> &[Chunkset] {
+        &self.chunk_sets
+    }
 
     /// Gets a mutable slice of chunksets.
-    pub fn chunksets_mut(&mut self) -> &mut [Chunkset] { &mut self.chunk_sets }
+    pub fn chunksets_mut(&mut self) -> &mut [Chunkset] {
+        &mut self.chunk_sets
+    }
 
     /// Gets a description of the component types in the archetype.
-    pub fn description(&self) -> &ArchetypeDescription { &self.desc }
+    pub fn description(&self) -> &ArchetypeDescription {
+        &self.desc
+    }
 
     pub(crate) fn defrag<F: FnMut(Entity, EntityLocation)>(
         &mut self,
@@ -639,7 +697,9 @@ impl ArchetypeData {
     }
 }
 
-fn align_up(addr: usize, align: usize) -> usize { (addr + (align - 1)) & align.wrapping_neg() }
+fn align_up(addr: usize, align: usize) -> usize {
+    (addr + (align - 1)) & align.wrapping_neg()
+}
 
 /// Describes the data layout for a chunk.
 pub struct ComponentStorageLayout {
@@ -650,10 +710,14 @@ pub struct ComponentStorageLayout {
 
 impl ComponentStorageLayout {
     /// The maximum number of entities that can be stored in each chunk.
-    pub fn capacity(&self) -> usize { self.capacity }
+    pub fn capacity(&self) -> usize {
+        self.capacity
+    }
 
     /// The components in each chunk.
-    pub fn components(&self) -> &[(ComponentTypeId, usize, ComponentMeta)] { &self.data_layout }
+    pub fn components(&self) -> &[(ComponentTypeId, usize, ComponentMeta)] {
+        &self.data_layout
+    }
 
     fn alloc_storage(&self, id: ChunkId) -> ComponentStorage {
         let storage_info = self
@@ -669,6 +733,7 @@ impl ComponentStorageLayout {
                         element_size: meta.size,
                         drop_fn: meta.drop_fn,
                         version: UnsafeCell::new(Wrapping(0)),
+                        changed: UnsafeCell::new(Wrapping(false)),
                     },
                 )
             })
@@ -699,16 +764,22 @@ pub struct Chunkset {
 impl Deref for Chunkset {
     type Target = [ComponentStorage];
 
-    fn deref(&self) -> &Self::Target { self.chunks.as_slice() }
+    fn deref(&self) -> &Self::Target {
+        self.chunks.as_slice()
+    }
 }
 
 impl DerefMut for Chunkset {
-    fn deref_mut(&mut self) -> &mut Self::Target { self.chunks.as_mut_slice() }
+    fn deref_mut(&mut self) -> &mut Self::Target {
+        self.chunks.as_mut_slice()
+    }
 }
 
 impl Chunkset {
     /// Pushes a new chunk into the set.
-    pub fn push(&mut self, chunk: ComponentStorage) { self.chunks.push(chunk); }
+    pub fn push(&mut self, chunk: ComponentStorage) {
+        self.chunks.push(chunk);
+    }
 
     pub(crate) fn drain<R: RangeBounds<usize>>(
         &mut self,
@@ -818,11 +889,17 @@ impl ChunkId {
         ChunkId(archetype, set, index)
     }
 
-    pub fn archetype_id(&self) -> ArchetypeId { self.0 }
+    pub fn archetype_id(&self) -> ArchetypeId {
+        self.0
+    }
 
-    pub(crate) fn set(&self) -> usize { self.1 }
+    pub(crate) fn set(&self) -> usize {
+        self.1
+    }
 
-    pub(crate) fn index(&self) -> usize { self.2 }
+    pub(crate) fn index(&self) -> usize {
+        self.2
+    }
 }
 
 /// A set of component slices located on a chunk.
@@ -852,11 +929,17 @@ impl Components {
             .map(move |i| unsafe { &mut self.0.get_unchecked_mut(i).1 })
     }
 
-    fn iter(&mut self) -> Iter<(ComponentTypeId, ComponentAccessor)> { self.0.iter() }
+    fn iter(&mut self) -> Iter<(ComponentTypeId, ComponentAccessor)> {
+        self.0.iter()
+    }
 
-    fn iter_mut(&mut self) -> IterMut<(ComponentTypeId, ComponentAccessor)> { self.0.iter_mut() }
+    fn iter_mut(&mut self) -> IterMut<(ComponentTypeId, ComponentAccessor)> {
+        self.0.iter_mut()
+    }
 
-    fn drain(&mut self) -> Drain<(ComponentTypeId, ComponentAccessor)> { self.0.drain() }
+    fn drain(&mut self) -> Drain<(ComponentTypeId, ComponentAccessor)> {
+        self.0.drain()
+    }
 }
 
 /// Stores a chunk of entities and their component data of a specific data layout.
@@ -872,25 +955,39 @@ pub struct ComponentStorage {
 
 impl ComponentStorage {
     /// Gets the unique ID of the chunk.
-    pub fn id(&self) -> ChunkId { self.id }
+    pub fn id(&self) -> ChunkId {
+        self.id
+    }
 
     /// Gets the number of entities stored in the chunk.
-    pub fn len(&self) -> usize { self.entities.len() }
+    pub fn len(&self) -> usize {
+        self.entities.len()
+    }
 
     /// Gets the maximum number of entities that can be stored in the chunk.
-    pub fn capacity(&self) -> usize { self.capacity }
+    pub fn capacity(&self) -> usize {
+        self.capacity
+    }
 
     /// Determines if the chunk is full.
-    pub fn is_full(&self) -> bool { self.len() >= self.capacity }
+    pub fn is_full(&self) -> bool {
+        self.len() >= self.capacity
+    }
 
     /// Determines if the chunk is empty.
-    pub fn is_empty(&self) -> bool { self.entities.len() == 0 }
+    pub fn is_empty(&self) -> bool {
+        self.entities.len() == 0
+    }
 
     /// Determines if the internal memory for this chunk has been allocated.
-    pub fn is_allocated(&self) -> bool { self.component_data.is_some() }
+    pub fn is_allocated(&self) -> bool {
+        self.component_data.is_some()
+    }
 
     /// Gets a slice reference containing the IDs of all entities stored in the chunk.
-    pub fn entities(&self) -> &[Entity] { self.entities.as_slice() }
+    pub fn entities(&self) -> &[Entity] {
+        self.entities.as_slice()
+    }
 
     /// Gets a component accessor for the specified component type.
     pub fn components(&self, component_type: ComponentTypeId) -> Option<&ComponentAccessor> {
@@ -1035,11 +1132,22 @@ pub struct ComponentAccessor {
     capacity: usize,
     drop_fn: Option<fn(*mut u8)>,
     version: UnsafeCell<Wrapping<usize>>,
+    changed: UnsafeCell<Wrapping<bool>>,
 }
 
 impl ComponentAccessor {
     /// Gets the version of the component slice.
-    pub fn version(&self) -> usize { unsafe { (*self.version.get()).0 } }
+    pub fn version(&self) -> usize {
+        unsafe { (*self.version.get()).0 }
+    }
+
+    pub fn changed(&self) -> bool {
+        unsafe { (*self.changed.get()).0 }
+    }
+
+    pub fn mark_unchanged(&self) {
+        unsafe { *self.changed.get() = Wrapping(false) };
+    }
 
     /// Gets a raw pointer to the start of the component slice.
     ///
@@ -1068,6 +1176,7 @@ impl ComponentAccessor {
         // - but the pointer `get_mut` ensures exclusive access at runtime
         let ptr = self.ptr.get_mut();
         unsafe { *self.version.get() += Wrapping(1) };
+        unsafe { *self.changed.get() = Wrapping(true) };
         (ptr, self.element_size, unsafe { *self.count.get() })
     }
 
@@ -1098,7 +1207,9 @@ impl ComponentAccessor {
     }
 
     /// Creates a writer for pushing components into or removing from the vec.
-    pub fn writer(&mut self) -> ComponentWriter { ComponentWriter::new(self) }
+    pub fn writer(&mut self) -> ComponentWriter {
+        ComponentWriter::new(self)
+    }
 }
 
 impl Debug for ComponentAccessor {
@@ -1149,6 +1260,7 @@ impl<'a> ComponentWriter<'a> {
         );
         *self.accessor.count.get() += count;
         *self.accessor.version.get() += Wrapping(1);
+        *self.accessor.changed.get() = Wrapping(true);
     }
 
     /// Pushes new components onto the end of the vec.
@@ -1234,13 +1346,19 @@ impl TagStorage {
     }
 
     /// Gets the element metadata.
-    pub fn element(&self) -> &TagMeta { &self.element }
+    pub fn element(&self) -> &TagMeta {
+        &self.element
+    }
 
     /// Gets the number of tags contained within the vector.
-    pub fn len(&self) -> usize { self.len }
+    pub fn len(&self) -> usize {
+        self.len
+    }
 
     /// Determines if the vector is empty.
-    pub fn is_empty(&self) -> bool { self.len() < 1 }
+    pub fn is_empty(&self) -> bool {
+        self.len() < 1
+    }
 
     /// Pushes a new tag onto the end of the vector.
     ///

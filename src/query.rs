@@ -98,7 +98,9 @@ pub struct Read<T: Component>(PhantomData<T>);
 impl<'a, T: Component> DefaultFilter for Read<T> {
     type Filter = EntityFilterTuple<ComponentFilter<T>, Passthrough, Passthrough>;
 
-    fn filter() -> Self::Filter { super::filter::filter_fns::component() }
+    fn filter() -> Self::Filter {
+        super::filter::filter_fns::component()
+    }
 }
 
 impl<'a, T: Component> View<'a> for Read<T> {
@@ -115,11 +117,17 @@ impl<'a, T: Component> View<'a> for Read<T> {
         RefIter::new(slice_borrow, slice.iter())
     }
 
-    fn validate() -> bool { true }
+    fn validate() -> bool {
+        true
+    }
 
-    fn reads<D: Component>() -> bool { TypeId::of::<T>() == TypeId::of::<D>() }
+    fn reads<D: Component>() -> bool {
+        TypeId::of::<T>() == TypeId::of::<D>()
+    }
 
-    fn writes<D: Component>() -> bool { false }
+    fn writes<D: Component>() -> bool {
+        false
+    }
 }
 
 impl<T: Component> ViewElement for Read<T> {
@@ -133,7 +141,9 @@ pub struct Write<T: Component>(PhantomData<T>);
 impl<'a, T: Component> DefaultFilter for Write<T> {
     type Filter = EntityFilterTuple<ComponentFilter<T>, Passthrough, Passthrough>;
 
-    fn filter() -> Self::Filter { super::filter::filter_fns::component() }
+    fn filter() -> Self::Filter {
+        super::filter::filter_fns::component()
+    }
 }
 
 impl<'a, T: Component> View<'a> for Write<T> {
@@ -152,13 +162,19 @@ impl<'a, T: Component> View<'a> for Write<T> {
     }
 
     #[inline]
-    fn validate() -> bool { true }
+    fn validate() -> bool {
+        true
+    }
 
     #[inline]
-    fn reads<D: Component>() -> bool { TypeId::of::<T>() == TypeId::of::<D>() }
+    fn reads<D: Component>() -> bool {
+        TypeId::of::<T>() == TypeId::of::<D>()
+    }
 
     #[inline]
-    fn writes<D: Component>() -> bool { TypeId::of::<T>() == TypeId::of::<D>() }
+    fn writes<D: Component>() -> bool {
+        TypeId::of::<T>() == TypeId::of::<D>()
+    }
 }
 
 impl<T: Component> ViewElement for Write<T> {
@@ -172,7 +188,9 @@ pub struct Tagged<T: Tag>(PhantomData<T>);
 impl<'a, T: Tag> DefaultFilter for Tagged<T> {
     type Filter = EntityFilterTuple<TagFilter<T>, Passthrough, Passthrough>;
 
-    fn filter() -> Self::Filter { super::filter::filter_fns::tag() }
+    fn filter() -> Self::Filter {
+        super::filter::filter_fns::tag()
+    }
 }
 
 impl<'a, T: Tag> View<'a> for Tagged<T> {
@@ -196,13 +214,19 @@ impl<'a, T: Tag> View<'a> for Tagged<T> {
     }
 
     #[inline]
-    fn validate() -> bool { true }
+    fn validate() -> bool {
+        true
+    }
 
     #[inline]
-    fn reads<D: Component>() -> bool { false }
+    fn reads<D: Component>() -> bool {
+        false
+    }
 
     #[inline]
-    fn writes<D: Component>() -> bool { false }
+    fn writes<D: Component>() -> bool {
+        false
+    }
 }
 
 impl<T: Tag> ViewElement for Tagged<T> {
@@ -297,7 +321,9 @@ impl<'a, V: for<'b> View<'b>> Chunk<'a, V> {
 
     /// Get a slice of all entities contained within the chunk.
     #[inline]
-    pub fn entities(&self) -> &'a [Entity] { self.components.entities() }
+    pub fn entities(&self) -> &'a [Entity] {
+        self.components.entities()
+    }
 
     /// Get an iterator of all data contained within the chunk.
     #[inline]
@@ -338,6 +364,22 @@ impl<'a, V: for<'b> View<'b>> Chunk<'a, V> {
         self.components
             .components(ComponentTypeId::of::<T>())
             .map(|c| unsafe { c.data_slice::<T>() })
+    }
+
+    ///Iterates all components of type and returns an immutable collection
+    ///Updates the changed flag.
+    pub fn changed<T: Component>(&self) -> Option<RefMap<'a, Shared<'a>, &[T]>> {
+        if !V::reads::<T>() {
+            panic!("data type not readable via this query");
+        }
+        let components = self.components.components(ComponentTypeId::of::<T>());
+
+        let retv = components
+            .filter(|c| c.changed())
+            .map(|c| unsafe { c.data_slice::<T>() });
+        components?.mark_unchanged();
+
+        retv
     }
 
     /// Get a mutable slice of component data.

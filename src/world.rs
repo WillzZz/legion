@@ -46,7 +46,9 @@ pub struct Universe {
 
 impl Universe {
     /// Creates a new `Universe`.
-    pub fn new() -> Self { Self::default() }
+    pub fn new() -> Self {
+        Self::default()
+    }
 
     /// Creates a new `World` within this `Unvierse`.
     ///
@@ -92,12 +94,18 @@ impl World {
         }
     }
 
-    pub(crate) fn storage(&self) -> &Storage { unsafe { &*self.storage.get() } }
+    pub(crate) fn storage(&self) -> &Storage {
+        unsafe { &*self.storage.get() }
+    }
 
-    pub(crate) fn storage_mut(&mut self) -> &mut Storage { unsafe { &mut *self.storage.get() } }
+    pub(crate) fn storage_mut(&mut self) -> &mut Storage {
+        unsafe { &mut *self.storage.get() }
+    }
 
     /// Gets the unique ID of this world.
-    pub fn id(&self) -> WorldId { self.id }
+    pub fn id(&self) -> WorldId {
+        self.id
+    }
 
     /// Inserts new entities into the world.
     ///
@@ -476,6 +484,32 @@ impl World {
         Some(RefMut::new(slice_borrow, component))
     }
 
+    pub fn get_component_changed<T: Component>(&self, entity: Entity) -> Option<Ref<Shared, T>> {
+        if !self.is_alive(entity) {
+            return None;
+        }
+
+        let location = self.entity_allocator.get_location(entity.index())?;
+        let archetype = self.storage().archetypes().get(location.archetype())?;
+        let chunk = archetype
+            .chunksets()
+            .get(location.set())?
+            .get(location.chunk())?;
+
+        let component_accessor = chunk.components(ComponentTypeId::of::<T>())?;
+
+        if component_accessor.changed() {
+            let (slice_borrow, slice) =
+                unsafe { component_accessor.data_slice::<T>().deconstruct() };
+            let component = slice.get(location.component())?;
+
+            component_accessor.mark_unchanged();
+            Some(Ref::new(slice_borrow, component))
+        } else {
+            None
+        }
+    }
+
     /// Gets tag data for the given entity.
     ///
     /// Returns `Some(data)` if the entity was found and contains the specified data.
@@ -492,7 +526,9 @@ impl World {
     }
 
     /// Determines if the given `Entity` is alive within this `World`.
-    pub fn is_alive(&self, entity: Entity) -> bool { self.entity_allocator.is_alive(entity) }
+    pub fn is_alive(&self, entity: Entity) -> bool {
+        self.entity_allocator.is_alive(entity)
+    }
 
     /// Iteratively defragments the world's internal memory.
     ///
@@ -939,7 +975,9 @@ struct DynamicComponentLayout<'a> {
 impl<'a> ComponentLayout for DynamicComponentLayout<'a> {
     type Filter = Self;
 
-    fn get_filter(&mut self) -> &mut Self::Filter { self }
+    fn get_filter(&mut self) -> &mut Self::Filter {
+        self
+    }
 
     fn tailor_archetype(&self, archetype: &mut ArchetypeDescription) {
         // copy components from existing archetype into new
@@ -997,7 +1035,9 @@ unsafe impl<'a> Sync for DynamicTagLayout<'a> {}
 impl<'a> TagLayout for DynamicTagLayout<'a> {
     type Filter = Self;
 
-    fn get_filter(&mut self) -> &mut Self::Filter { self }
+    fn get_filter(&mut self) -> &mut Self::Filter {
+        self
+    }
 
     fn tailor_archetype(&self, archetype: &mut ArchetypeDescription) {
         // copy tags from existing archetype into new
@@ -1021,7 +1061,9 @@ impl<'a> TagLayout for DynamicTagLayout<'a> {
 impl<'a, 'b> Filter<ArchetypeFilterData<'b>> for DynamicTagLayout<'a> {
     type Iter = SliceVecIter<'b, TagTypeId>;
 
-    fn collect(&self, source: ArchetypeFilterData<'b>) -> Self::Iter { source.tag_types.iter() }
+    fn collect(&self, source: ArchetypeFilterData<'b>) -> Self::Iter {
+        source.tag_types.iter()
+    }
 
     fn is_match(&mut self, item: &<Self::Iter as Iterator>::Item) -> Option<bool> {
         Some(
@@ -1115,7 +1157,9 @@ mod tests {
     }
 
     #[test]
-    fn create_universe() { Universe::default(); }
+    fn create_universe() {
+        Universe::default();
+    }
 
     #[test]
     fn create_world() {
