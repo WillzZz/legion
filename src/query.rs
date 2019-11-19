@@ -194,7 +194,26 @@ impl<'a, T: Tag> DefaultFilter for Tagged<T> {
 }
 
 impl<'a, T: Tag> View<'a> for Tagged<T> {
-    type Iter = Take<Repeat<&'a T>>;
+    //type Iter = Take<Repeat<&'a T>>;
+    //type Iter = Take<Shared<&'a T>>;
+    //type Iter = RefIter<'a, Shared<'a>, T, Iter<'a, T>>;
+    type Iter = Iter<'a, T>;
+
+    // let location = self.entity_allocator.get_location(entity.index())?;
+    // let archetype = self.storage().archetypes().get(location.archetype())?;
+    // let tags = archetype.tags().get(TagTypeId::of::<T>())?;
+    // unsafe { tags.data_slice::<T>().get(location.set()) }
+
+    // fn fetch(_: &'a ArchetypeData, chunk: &'a ComponentStorage, _: usize) -> Self::Iter {
+    //     let (slice_borrow, slice) = unsafe {
+    //         chunk
+    //             .components(ComponentTypeId::of::<T>())
+    //             .unwrap()
+    //             .data_slice::<T>()
+    //             .deconstruct()
+    //     };
+    //     RefIter::new(slice_borrow, slice.iter())
+    // }
 
     #[inline]
     fn fetch(
@@ -208,10 +227,29 @@ impl<'a, T: Tag> View<'a> for Tagged<T> {
                 .get(TagTypeId::of::<T>())
                 .unwrap()
                 .data_slice::<T>()
-                .get_unchecked(chunk_index)
+                .iter()
         };
-        std::iter::repeat(data).take(chunk.len())
+        data
+        //RefIter::new(data.iter(), chunk.iter())
+        //std::iter::repeat(data).take(chunk.len())
     }
+    //old
+    // #[inline]
+    // fn fetch(
+    //     archetype: &'a ArchetypeData,
+    //     chunk: &'a ComponentStorage,
+    //     chunk_index: usize,
+    // ) -> Self::Iter {
+    //     let data = unsafe {
+    //         archetype
+    //             .tags()
+    //             .get(TagTypeId::of::<T>())
+    //             .unwrap()
+    //             .data_slice::<T>()
+    //             .get_unchecked(chunk_index)
+    //     };
+    //     std::iter::repeat(data).take(chunk.len())
+    // }
 
     #[inline]
     fn validate() -> bool {

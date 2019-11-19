@@ -484,7 +484,11 @@ impl World {
         Some(RefMut::new(slice_borrow, component))
     }
 
-    pub fn get_component_changed<T: Component>(&self, entity: Entity) -> Option<Ref<Shared, T>> {
+    pub fn get_component_changed<T: Component>(
+        &self,
+        entity: Entity,
+        mark_unchanged: bool,
+    ) -> Option<Ref<Shared, T>> {
         if !self.is_alive(entity) {
             return None;
         }
@@ -503,8 +507,41 @@ impl World {
                 unsafe { component_accessor.data_slice::<T>().deconstruct() };
             let component = slice.get(location.component())?;
 
-            component_accessor.mark_unchanged();
+            if mark_unchanged {
+                component_accessor.mark_unchanged();
+            }
             Some(Ref::new(slice_borrow, component))
+        } else {
+            None
+        }
+    }
+    pub fn get_component_changed_mut<T: Component>(
+        &self,
+        entity: Entity,
+        mark_unchanged: bool,
+    ) -> Option<RefMut<Exclusive, T>> {
+        if !self.is_alive(entity) {
+            return None;
+        }
+
+        let location = self.entity_allocator.get_location(entity.index())?;
+        let archetype = self.storage().archetypes().get(location.archetype())?;
+        let chunk = archetype
+            .chunksets()
+            .get(location.set())?
+            .get(location.chunk())?;
+
+        let component_accessor = chunk.components(ComponentTypeId::of::<T>())?;
+
+        if component_accessor.changed() {
+            let (slice_borrow, slice) =
+                unsafe { component_accessor.data_slice_mut::<T>().deconstruct() };
+            let component = slice.get_mut(location.component())?;
+
+            if mark_unchanged {
+                component_accessor.mark_unchanged();
+            }
+            Some(RefMut::new(slice_borrow, component))
         } else {
             None
         }
@@ -522,7 +559,7 @@ impl World {
         let location = self.entity_allocator.get_location(entity.index())?;
         let archetype = self.storage().archetypes().get(location.archetype())?;
         let tags = archetype.tags().get(TagTypeId::of::<T>())?;
-        unsafe { tags.data_slice::<T>().get(location.chunk()) }
+        unsafe { tags.data_slice::<T>().get(location.set()) }
     }
 
     /// Determines if the given `Entity` is alive within this `World`.
